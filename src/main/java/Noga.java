@@ -35,6 +35,22 @@ public class Noga {
                 System.out.println(tasks[index]);
                 continue;
             }
+            if(userInput.startsWith("delete")){
+                System.out.println("____________________________________________________________");
+                int index = Integer.parseInt(userInput.split(" ")[1]);
+                System.out.println("Noted. I've removed this task:");
+                System.out.println("  " + tasks[index]);
+                
+                // Shift remaining tasks to fill the gap
+                for(int i = index; i < cur_index - 1; i++){
+                    tasks[i] = tasks[i + 1];
+                }
+                cur_index--;
+                
+                System.out.println("Now you have " + (cur_index-1) + " tasks in the list.");
+                System.out.println("____________________________________________________________");
+                continue;
+            }
             
             System.out.println("____________________________________________________________");
             if(userInput.startsWith("todo")) {
