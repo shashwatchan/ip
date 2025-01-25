@@ -8,7 +8,7 @@ public class Noga {
         int cur_index = 1;
 
         while(true){                
-            String userInput = scanner.nextLine();
+            String userInput = scanner.nextLine().trim();
             if(userInput.equals("bye")){
                 break;
             }       
@@ -22,54 +22,132 @@ public class Noga {
                 continue;
             }
             if(userInput.startsWith("mark")){
-                int index = Integer.parseInt(userInput.split(" ")[1]);
-                tasks[index].mark();
-                System.out.println("Nice! I've marked this task as done:");
-                System.out.println(tasks[index]);
+                try {
+                    String[] parts = userInput.split(" ");
+                    if (parts.length < 2) {
+                        System.out.println("____________________________________________________________");
+                        System.out.println("Please specify which task to mark (e.g., mark 1)");
+                        System.out.println("____________________________________________________________");
+                        continue;
+                    }
+                    int index = Integer.parseInt(parts[1]);
+                    if (index < 1 || index >= cur_index) {
+                        System.out.println("____________________________________________________________");
+                        System.out.println("Task number " + index + " does not exist!");
+                        System.out.println("____________________________________________________________");
+                        continue;
+                    }
+                    tasks[index].mark();
+                    System.out.println("Nice! I've marked this task as done:");
+                    System.out.println(tasks[index]);
+                } catch (NumberFormatException e) {
+                    System.out.println("____________________________________________________________");
+                    System.out.println("Please provide a valid task number!");
+                    System.out.println("____________________________________________________________");
+                }
                 continue;
             }
             if(userInput.startsWith("unmark")){
-                int index = Integer.parseInt(userInput.split(" ")[1]);
-                tasks[index].unmark();
-                System.out.println("OK, I've marked this task as not done yet:");
-                System.out.println(tasks[index]);
+                try {
+                    String[] parts = userInput.split(" ");
+                    if (parts.length < 2) {
+                        System.out.println("____________________________________________________________");
+                        System.out.println("Please specify which task to unmark (e.g., unmark 1)");
+                        System.out.println("____________________________________________________________");
+                        continue;
+                    }
+                    int index = Integer.parseInt(parts[1]);
+                    if (index < 1 || index >= cur_index) {
+                        System.out.println("____________________________________________________________");
+                        System.out.println("Task number " + index + " does not exist!");
+                        System.out.println("____________________________________________________________");
+                        continue;
+                    }
+                    tasks[index].unmark();
+                    System.out.println("OK, I've marked this task as not done yet:");
+                    System.out.println(tasks[index]);
+                } catch (NumberFormatException e) {
+                    System.out.println("____________________________________________________________");
+                    System.out.println("Please provide a valid task number!");
+                    System.out.println("____________________________________________________________");
+                }
                 continue;
             }
             if(userInput.startsWith("delete")){
-                System.out.println("____________________________________________________________");
-                int index = Integer.parseInt(userInput.split(" ")[1]);
-                System.out.println("Noted. I've removed this task:");
-                System.out.println("  " + tasks[index]);
-                
-                // Shift remaining tasks to fill the gap
-                for(int i = index; i < cur_index - 1; i++){
-                    tasks[i] = tasks[i + 1];
+                try {
+                    String[] parts = userInput.split(" ");
+                    if (parts.length < 2) {
+                        System.out.println("____________________________________________________________");
+                        System.out.println("Please specify which task to delete (e.g., delete 1)");
+                        System.out.println("____________________________________________________________");
+                        continue;
+                    }
+                    int index = Integer.parseInt(parts[1]);
+                    if (index < 1 || index >= cur_index) {
+                        System.out.println("____________________________________________________________");
+                        System.out.println("Task number " + index + " does not exist!");
+                        System.out.println("____________________________________________________________");
+                        continue;
+                    }
+                    System.out.println("____________________________________________________________");
+                    System.out.println("Noted. I've removed this task:");
+                    System.out.println("  " + tasks[index]);
+                    
+                    // Shift remaining tasks to fill the gap
+                    for(int i = index; i < cur_index - 1; i++){
+                        tasks[i] = tasks[i + 1];
+                    }
+                    cur_index--;
+                    
+                    System.out.println("Now you have " + (cur_index-1) + " tasks in the list.");
+                    System.out.println("____________________________________________________________");
+                } catch (NumberFormatException e) {
+                    System.out.println("____________________________________________________________");
+                    System.out.println("Please provide a valid task number!");
+                    System.out.println("____________________________________________________________");
                 }
-                cur_index--;
-                
-                System.out.println("Now you have " + (cur_index-1) + " tasks in the list.");
-                System.out.println("____________________________________________________________");
                 continue;
             }
             
             System.out.println("____________________________________________________________");
             if(userInput.startsWith("todo")) {
-                String description = userInput.substring(5);
+                String description = userInput.substring(4).trim();
+                if (description.isEmpty()) {
+                    System.out.println("Please provide a description for your todo!");
+                    System.out.println("____________________________________________________________");
+                    continue;
+                }
                 tasks[cur_index] = new Task(description);
             } else if(userInput.startsWith("deadline")) {
                 String[] parts = userInput.split(" /by ");
-                if(parts.length == 2) {
-                    String description = parts[0].substring(9);
-                    tasks[cur_index] = new Deadline(description, parts[1]);
+                if(parts.length != 2 || parts[0].substring(8).trim().isEmpty()) {
+                    System.out.println("Please use the format: deadline <description> /by <deadline>");
+                    System.out.println("____________________________________________________________");
+                    continue;
                 }
+                String description = parts[0].substring(8).trim();
+                tasks[cur_index] = new Deadline(description, parts[1]);
             } else if(userInput.startsWith("event")) {
                 String[] parts = userInput.split(" /from | /to ");
-                if(parts.length == 3) {
-                    String description = parts[0].substring(6);
-                    tasks[cur_index] = new Event(description, parts[1], parts[2]);
+                if(parts.length != 3 || parts[0].substring(5).trim().isEmpty()) {
+                    System.out.println("Please use the format: event <description> /from <start-time> /to <end-time>");
+                    System.out.println("____________________________________________________________");
+                    continue;
                 }
+                String description = parts[0].substring(5).trim();
+                tasks[cur_index] = new Event(description, parts[1], parts[2]);
             } else {
-                tasks[cur_index] = new Task(userInput);
+                System.out.println("I'm not sure what you mean. Here are the commands I understand:");
+                System.out.println("  todo <description>");
+                System.out.println("  deadline <description> /by <deadline>");
+                System.out.println("  event <description> /from <start-time> /to <end-time>");
+                System.out.println("  list");
+                System.out.println("  mark <task-number>");
+                System.out.println("  unmark <task-number>");
+                System.out.println("  delete <task-number>");
+                System.out.println("  bye");
+                System.out.println("____________________________________________________________");
+                continue;
             }
             
             System.out.println("Got it. I've added this task:");
