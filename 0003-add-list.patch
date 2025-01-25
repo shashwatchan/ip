@@ -1,0 +1,44 @@
+From a995061f285bf53c2fc8259c5883bd244a797433 Mon Sep 17 00:00:00 2001
+From: Shashwat Chandra <shashwat@Shashwats-MacBook-Air.local>
+Date: Fri, 24 Jan 2025 13:18:22 +0800
+Subject: [PATCH 3/4] add list
+
+---
+ src/main/java/Noga.java | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/src/main/java/Noga.java b/src/main/java/Noga.java
+index 1bde439..355b1dd 100644
+--- a/src/main/java/Noga.java
++++ b/src/main/java/Noga.java
+@@ -1,15 +1,26 @@
+ import java.util.Scanner;
+ 
++
+ public class Noga {
+     public static void main(String[] args) {
+         System.out.println("Hello I am Noga, what can I do for you?");
+         Scanner scanner = new Scanner(System.in);
++        String tasks[] = new String[101];
++        int cur_index = 1;
++
+         while(true){
+             String userInput = scanner.nextLine();
+             if(userInput.equals("bye")){
+                 break;
+             }
+-            System.out.println(userInput);
++            if(userInput.equals("list")){
++                for(int i = 1; i < cur_index; i++){
++                    System.out.println(i + ". " + tasks[i]);
++                }
++                continue;
++            }
++            tasks[cur_index++] = userInput;
++            System.out.println("added: "+ userInput);
+         }
+         System.out.println("Bye. Hope to see you again soon!");
+     }
+-- 
+2.39.5 (Apple Git-154)
+

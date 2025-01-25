@@ -1,0 +1,33 @@
+From 56efa9f98412aa3e595b1af1d5b455ac44be0842 Mon Sep 17 00:00:00 2001
+From: Shashwat Chandra <shashwat@Shashwats-MacBook-Air.local>
+Date: Fri, 24 Jan 2025 13:08:37 +0800
+Subject: [PATCH 2/4] add echo
+
+---
+ src/main/java/Noga.java | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/src/main/java/Noga.java b/src/main/java/Noga.java
+index 8f67911..1bde439 100644
+--- a/src/main/java/Noga.java
++++ b/src/main/java/Noga.java
+@@ -1,6 +1,16 @@
++import java.util.Scanner;
++
+ public class Noga {
+     public static void main(String[] args) {
+         System.out.println("Hello I am Noga, what can I do for you?");
++        Scanner scanner = new Scanner(System.in);
++        while(true){
++            String userInput = scanner.nextLine();
++            if(userInput.equals("bye")){
++                break;
++            }
++            System.out.println(userInput);
++        }
+         System.out.println("Bye. Hope to see you again soon!");
+     }
+ }
+-- 
+2.39.5 (Apple Git-154)
+

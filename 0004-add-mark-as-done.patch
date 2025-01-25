@@ -1,0 +1,84 @@
+From ede2e03789f3347eb746a189f9521584b4e32fac Mon Sep 17 00:00:00 2001
+From: Shashwat Chandra <shashwat@Shashwats-MacBook-Air.local>
+Date: Fri, 24 Jan 2025 13:50:55 +0800
+Subject: [PATCH 4/4] add mark as done
+
+---
+ src/main/java/Noga.java | 20 +++++++++++++++++---
+ src/main/java/Task.java | 17 +++++++++++++++++
+ 2 files changed, 34 insertions(+), 3 deletions(-)
+ create mode 100644 src/main/java/Task.java
+
+diff --git a/src/main/java/Noga.java b/src/main/java/Noga.java
+index 355b1dd..c5a5cf7 100644
+--- a/src/main/java/Noga.java
++++ b/src/main/java/Noga.java
+@@ -1,11 +1,10 @@
+ import java.util.Scanner;
+ 
+-
+ public class Noga {
+     public static void main(String[] args) {
+         System.out.println("Hello I am Noga, what can I do for you?");
+         Scanner scanner = new Scanner(System.in);
+-        String tasks[] = new String[101];
++        Task tasks[] = new Task[101];
+         int cur_index = 1;
+ 
+         while(true){
+@@ -14,12 +13,27 @@ public class Noga {
+                 break;
+             }
+             if(userInput.equals("list")){
++                System.out.println("Here are the tasks in your list:");
+                 for(int i = 1; i < cur_index; i++){
+                     System.out.println(i + ". " + tasks[i]);
+                 }
+                 continue;
+             }
+-            tasks[cur_index++] = userInput;
++            if(userInput.startsWith("mark")){
++                int index = Integer.parseInt(userInput.split(" ")[1]);
++                tasks[index].mark();
++                System.out.println("Nice! I've marked this task as done:");
++                System.out.println(tasks[index]);
++                continue;
++            }
++            if(userInput.startsWith("unmark")){
++                int index = Integer.parseInt(userInput.split(" ")[1]);
++                tasks[index].unmark();
++                System.out.println("OK, I've marked this task as not done yet:");
++                System.out.println(tasks[index]);
++                continue;
++            }
++            tasks[cur_index++] = new Task(userInput);
+             System.out.println("added: "+ userInput);
+         }
+         System.out.println("Bye. Hope to see you again soon!");
+diff --git a/src/main/java/Task.java b/src/main/java/Task.java
+new file mode 100644
+index 0000000..02e5b19
+--- /dev/null
++++ b/src/main/java/Task.java
+@@ -0,0 +1,17 @@
++public class Task {
++    String description;
++    boolean marked;
++    public Task(String description){
++        this.description = description;
++        this.marked = false;
++    }
++    public String toString(){
++        return "[" + (marked ? "X" : " ") + "] " + description;
++    }
++    public void mark(){
++        marked = true;
++    }
++    public void unmark(){
++        marked = false;
++    }
++}
+\ No newline at end of file
+-- 
+2.39.5 (Apple Git-154)
+
