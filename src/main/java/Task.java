@@ -1,17 +1,29 @@
 public class Task {
-    String description;
-    boolean marked;
-    public Task(String description){
+    protected String description;
+    protected boolean isDone;
+    
+    public Task(String description) {
         this.description = description;
-        this.marked = false;
+        this.isDone = false;
     }
-    public String toString(){
-        return "[" + (marked ? "X" : " ") + "] " + description;
+    
+    public void mark() {
+        isDone = true;
     }
-    public void mark(){
-        marked = true;
+    
+    public void unmark() {
+        isDone = false;
     }
-    public void unmark(){
-        marked = false;
+    
+    @Override
+    public String toString() {
+        return String.format("[%c][%s] %s", 
+            getTypeIcon(),
+            isDone ? "X" : " ",
+            description);
+    }
+    
+    protected char getTypeIcon() {
+        return 'T';
     }
 }
