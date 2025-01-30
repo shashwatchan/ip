@@ -1,18 +1,24 @@
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 public class Event extends Task {
-    protected String startTime;
-    protected String endTime;
+    protected LocalDateTime startTime;
+    protected LocalDateTime endTime;
+    private static final DateTimeFormatter INPUT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+    private static final DateTimeFormatter OUTPUT_FORMAT = DateTimeFormatter.ofPattern("MMM d yyyy, h:mm a");
     
-    public Event(String description, String startTime, String endTime) {
+    public Event(String description, String startTime, String endTime) throws DateTimeParseException {
         super(description);
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.startTime = LocalDateTime.parse(startTime, INPUT_FORMAT);
+        this.endTime = LocalDateTime.parse(endTime, INPUT_FORMAT);
     }
     
-    public String getStartTime() {
+    public LocalDateTime getStartTime() {
         return startTime;
     }
     
-    public String getEndTime() {
+    public LocalDateTime getEndTime() {
         return endTime;
     }
     
@@ -23,6 +29,15 @@ public class Event extends Task {
     
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " + startTime + " to: " + endTime + ")";
+        return "[E]" + super.toString() + " (from: " + startTime.format(OUTPUT_FORMAT) 
+                + " to: " + endTime.format(OUTPUT_FORMAT) + ")";
+    }
+
+    public String toFileString() {
+        return String.format("E | %d | %s | %s | %s",
+                isDone() ? 1 : 0,
+                getDescription(),
+                startTime.format(INPUT_FORMAT),
+                endTime.format(INPUT_FORMAT));
     }
 } 

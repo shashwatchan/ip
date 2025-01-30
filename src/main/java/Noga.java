@@ -1,5 +1,9 @@
 import java.io.*;
 import java.nio.file.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 public class Noga {
@@ -39,24 +43,28 @@ public class Noga {
                 boolean isDone = parts[1].equals("1");
                 String description = parts[2];
 
-                switch (type) {
-                    case "T":
-                        tasks[cur_index] = new Task(description);
-                        break;
-                    case "D":
-                        if (parts.length < 4) continue;
-                        tasks[cur_index] = new Deadline(description, parts[3]);
-                        break;
-                    case "E":
-                        if (parts.length < 5) continue;
-                        tasks[cur_index] = new Event(description, parts[3], parts[4]);
-                        break;
-                }
+                try {
+                    switch (type) {
+                        case "T":
+                            tasks[cur_index] = new Task(description);
+                            break;
+                        case "D":
+                            if (parts.length < 4) continue;
+                            tasks[cur_index] = new Deadline(description, parts[3]);
+                            break;
+                        case "E":
+                            if (parts.length < 5) continue;
+                            tasks[cur_index] = new Event(description, parts[3], parts[4]);
+                            break;
+                    }
 
-                if (isDone) {
-                    tasks[cur_index].mark();
+                    if (isDone) {
+                        tasks[cur_index].mark();
+                    }
+                    cur_index++;
+                } catch (DateTimeParseException e) {
+                    System.out.println("Warning: Skipping task with invalid date format: " + line);
                 }
-                cur_index++;
             }
             reader.close();
         } catch (IOException e) {
@@ -71,18 +79,9 @@ public class Noga {
                 Task task = tasks[i];
                 String line;
                 if (task instanceof Event) {
-                    Event event = (Event) task;
-                    line = String.format("E | %d | %s | %s | %s",
-                            task.isDone() ? 1 : 0,
-                            task.getDescription(),
-                            event.getStartTime(),
-                            event.getEndTime());
+                    line = ((Event) task).toFileString();
                 } else if (task instanceof Deadline) {
-                    Deadline deadline = (Deadline) task;
-                    line = String.format("D | %d | %s | %s",
-                            task.isDone() ? 1 : 0,
-                            task.getDescription(),
-                            deadline.getBy());
+                    line = ((Deadline) task).toFileString();
                 } else {
                     line = String.format("T | %d | %s",
                             task.isDone() ? 1 : 0,
@@ -94,6 +93,36 @@ public class Noga {
             writer.close();
         } catch (IOException e) {
             System.out.println("Warning: Could not save tasks to file");
+        }
+    }
+
+    private void showTasksOnDate(String dateStr) {
+        try {
+            LocalDate date = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            System.out.println("Tasks on " + date.format(DateTimeFormatter.ofPattern("MMM d yyyy")) + ":");
+            boolean found = false;
+            
+            for (int i = 1; i < cur_index; i++) {
+                Task task = tasks[i];
+                LocalDateTime taskDate = null;
+                
+                if (task instanceof Deadline) {
+                    taskDate = ((Deadline) task).getBy();
+                } else if (task instanceof Event) {
+                    taskDate = ((Event) task).getStartTime();
+                }
+                
+                if (taskDate != null && taskDate.toLocalDate().equals(date)) {
+                    System.out.println(i + "." + task);
+                    found = true;
+                }
+            }
+            
+            if (!found) {
+                System.out.println("No tasks found on this date.");
+            }
+        } catch (DateTimeParseException e) {
+            System.out.println("Please use the format yyyy-MM-dd (e.g., 2024-03-15)");
         }
     }
 
@@ -206,6 +235,17 @@ public class Noga {
                 continue;
             }
             
+            // Add new command to show tasks on a specific date
+            if (userInput.startsWith("show date")) {
+                String dateStr = userInput.substring(9).trim();
+                if (dateStr.isEmpty()) {
+                    System.out.println("Please specify a date (yyyy-MM-dd)");
+                    continue;
+                }
+                showTasksOnDate(dateStr);
+                continue;
+            }
+            
             System.out.println("____________________________________________________________");
             if(userInput.startsWith("todo")) {
                 String description = userInput.substring(4).trim();
@@ -218,21 +258,37 @@ public class Noga {
             } else if(userInput.startsWith("deadline")) {
                 String[] parts = userInput.split(" /by ");
                 if(parts.length != 2 || parts[0].substring(8).trim().isEmpty()) {
-                    System.out.println("Please use the format: deadline <description> /by <deadline>");
+                    System.out.println("Please use the format: deadline <description> /by yyyy-MM-dd HHmm");
+                    System.out.println("Example: deadline return book /by 2024-03-15 1800");
                     System.out.println("____________________________________________________________");
                     continue;
                 }
                 String description = parts[0].substring(8).trim();
-                tasks[cur_index] = new Deadline(description, parts[1]);
+                try {
+                    tasks[cur_index] = new Deadline(description, parts[1].trim());
+                } catch (DateTimeParseException e) {
+                    System.out.println("Please use the format yyyy-MM-dd HHmm for the deadline");
+                    System.out.println("Example: 2024-03-15 1800 for March 15, 2024, 6:00 PM");
+                    System.out.println("____________________________________________________________");
+                    continue;
+                }
             } else if(userInput.startsWith("event")) {
                 String[] parts = userInput.split(" /from | /to ");
                 if(parts.length != 3 || parts[0].substring(5).trim().isEmpty()) {
-                    System.out.println("Please use the format: event <description> /from <start-time> /to <end-time>");
+                    System.out.println("Please use the format: event <description> /from yyyy-MM-dd HHmm /to yyyy-MM-dd HHmm");
+                    System.out.println("Example: event project meeting /from 2024-03-15 1400 /to 2024-03-15 1600");
                     System.out.println("____________________________________________________________");
                     continue;
                 }
                 String description = parts[0].substring(5).trim();
-                tasks[cur_index] = new Event(description, parts[1], parts[2]);
+                try {
+                    tasks[cur_index] = new Event(description, parts[1].trim(), parts[2].trim());
+                } catch (DateTimeParseException e) {
+                    System.out.println("Please use the format yyyy-MM-dd HHmm for the dates");
+                    System.out.println("Example: 2024-03-15 1400 for March 15, 2024, 2:00 PM");
+                    System.out.println("____________________________________________________________");
+                    continue;
+                }
             } else {
                 System.out.println("I'm not sure what you mean. Here are the commands I understand:");
                 System.out.println("  todo <description>");
@@ -242,6 +298,7 @@ public class Noga {
                 System.out.println("  mark <task-number>");
                 System.out.println("  unmark <task-number>");
                 System.out.println("  delete <task-number>");
+                System.out.println("  show date <date>");
                 System.out.println("  bye");
                 System.out.println("____________________________________________________________");
                 continue;

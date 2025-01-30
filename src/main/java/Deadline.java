@@ -1,12 +1,18 @@
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 public class Deadline extends Task {
-    protected String by;
-    
-    public Deadline(String description, String by) {
+    protected LocalDateTime by;
+    private static final DateTimeFormatter INPUT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+    private static final DateTimeFormatter OUTPUT_FORMAT = DateTimeFormatter.ofPattern("MMM d yyyy, h:mm a");
+
+    public Deadline(String description, String by) throws DateTimeParseException {
         super(description);
-        this.by = by;
+        this.by = LocalDateTime.parse(by, INPUT_FORMAT);
     }
     
-    public String getBy() {
+    public LocalDateTime getBy() {
         return by;
     }
     
@@ -17,6 +23,13 @@ public class Deadline extends Task {
     
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + by + ")";
+        return "[D]" + super.toString() + " (by: " + by.format(OUTPUT_FORMAT) + ")";
+    }
+
+    public String toFileString() {
+        return String.format("D | %d | %s | %s",
+                isDone() ? 1 : 0,
+                getDescription(),
+                by.format(INPUT_FORMAT));
     }
 } 
