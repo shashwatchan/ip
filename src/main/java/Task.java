@@ -15,12 +15,17 @@ public class Task {
         isDone = false;
     }
     
+    public String getDescription() {
+        return description;
+    }
+    
+    public boolean isDone() {
+        return isDone;
+    }
+    
     @Override
     public String toString() {
-        return String.format("[%c][%s] %s", 
-            getTypeIcon(),
-            isDone ? "X" : " ",
-            description);
+        return "[" + (isDone ? "✓" : "✗") + "] " + description;
     }
     
     protected char getTypeIcon() {
