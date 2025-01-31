@@ -7,9 +7,9 @@ import java.time.format.DateTimeParseException;
  * Extends the basic Task class with a deadline.
  */
 public class Deadline extends Task {
-    protected LocalDateTime by;
     private static final DateTimeFormatter INPUT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
     private static final DateTimeFormatter OUTPUT_FORMAT = DateTimeFormatter.ofPattern("MMM d yyyy, h:mm a");
+    private LocalDateTime by;
 
     /**
      * Creates a new Deadline task with the given description and deadline.
