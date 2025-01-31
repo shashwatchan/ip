@@ -3,9 +3,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class Deadline extends Task {
-    protected LocalDateTime by;
     private static final DateTimeFormatter INPUT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
     private static final DateTimeFormatter OUTPUT_FORMAT = DateTimeFormatter.ofPattern("MMM d yyyy, h:mm a");
+    private LocalDateTime by;
 
     public Deadline(String description, String by) throws DateTimeParseException {
         super(description);
