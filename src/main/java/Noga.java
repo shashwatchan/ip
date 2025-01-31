@@ -150,6 +150,24 @@ public class Noga {
         }
     }
 
+    private void findTasks(String keyword) {
+        System.out.println("____________________________________________________________");
+        System.out.println("Here are the matching tasks in your list:");
+        boolean found = false;
+        
+        for (int i = 1; i < cur_index; i++) {
+            if (tasks[i].getDescription().toLowerCase().contains(keyword.toLowerCase())) {
+                System.out.println(i + "." + tasks[i]);
+                found = true;
+            }
+        }
+        
+        if (!found) {
+            System.out.println("No matching tasks found.");
+        }
+        System.out.println("____________________________________________________________");
+    }
+
     /**
      * Starts the chatbot and processes user commands until exit.
      * Supports commands for adding, listing, marking, and managing tasks.
@@ -274,6 +292,19 @@ public class Noga {
                 continue;
             }
             
+            // Add new command to find tasks
+            if (userInput.startsWith("find")) {
+                String keyword = userInput.substring(4).trim();
+                if (keyword.isEmpty()) {
+                    System.out.println("____________________________________________________________");
+                    System.out.println("Please provide a keyword to search for!");
+                    System.out.println("____________________________________________________________");
+                    continue;
+                }
+                findTasks(keyword);
+                continue;
+            }
+            
             System.out.println("____________________________________________________________");
             if(userInput.startsWith("todo")) {
                 String description = userInput.substring(4).trim();
@@ -323,6 +354,7 @@ public class Noga {
                 System.out.println("  deadline <description> /by <deadline>");
                 System.out.println("  event <description> /from <start-time> /to <end-time>");
                 System.out.println("  list");
+                System.out.println("  find <keyword>");
                 System.out.println("  mark <task-number>");
                 System.out.println("  unmark <task-number>");
                 System.out.println("  delete <task-number>");
