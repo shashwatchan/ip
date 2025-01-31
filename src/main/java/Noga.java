@@ -6,12 +6,20 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
+/**
+ * A task management chatbot that helps users keep track of various tasks,
+ * including todos, deadlines, and events.
+ */
 public class Noga {
     private static final String DATA_DIR = "data";
     private static final String DATA_FILE = "data/tasks.txt";
     private Task[] tasks;
     private int cur_index;
 
+    /**
+     * Creates a new Noga chatbot instance.
+     * Initializes the task list and loads any existing tasks from storage.
+     */
     public Noga() {
         tasks = new Task[101];
         cur_index = 1;
@@ -19,6 +27,9 @@ public class Noga {
         loadTasks();
     }
 
+    /**
+     * Creates the data directory if it doesn't exist.
+     */
     private void createDataDirectory() {
         try {
             Files.createDirectories(Paths.get(DATA_DIR));
@@ -27,6 +38,10 @@ public class Noga {
         }
     }
 
+    /**
+     * Loads tasks from the storage file.
+     * Each task is stored in a specific format depending on its type.
+     */
     private void loadTasks() {
         try {
             if (!Files.exists(Paths.get(DATA_FILE))) {
@@ -72,6 +87,10 @@ public class Noga {
         }
     }
 
+    /**
+     * Saves all tasks to the storage file.
+     * Each task is converted to its storage format before saving.
+     */
     private void saveTasks() {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(DATA_FILE));
@@ -96,6 +115,11 @@ public class Noga {
         }
     }
 
+    /**
+     * Shows all tasks scheduled for a specific date.
+     *
+     * @param dateStr the date to search for in format "yyyy-MM-dd"
+     */
     private void showTasksOnDate(String dateStr) {
         try {
             LocalDate date = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -126,6 +150,10 @@ public class Noga {
         }
     }
 
+    /**
+     * Starts the chatbot and processes user commands until exit.
+     * Supports commands for adding, listing, marking, and managing tasks.
+     */
     public void run() {
         System.out.println("Hello I am Noga, what can I do for you?");
         Scanner scanner = new Scanner(System.in);
@@ -314,6 +342,12 @@ public class Noga {
         System.out.println("Bye. Hope to see you again soon!");
     }
 
+    /**
+     * Main entry point of the application.
+     * Creates and runs a new instance of the Noga chatbot.
+     *
+     * @param args command line arguments (not used)
+     */
     public static void main(String[] args) {
         new Noga().run();
     }
