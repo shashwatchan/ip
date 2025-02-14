@@ -1,6 +1,11 @@
 package noga;
-import java.io.*;
-import java.nio.file.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -169,19 +174,52 @@ public class Noga {
         System.out.println("____________________________________________________________");
     }
 
+    private void showHelp() {
+        System.out.println("____________________________________________________________");
+        System.out.println("Here are the commands I understand:");
+        System.out.println("  todo <description>");
+        System.out.println("    adds a todo task");
+        System.out.println("  deadline <description> /by yyyy-MM-dd HHmm");
+        System.out.println("    adds a deadline task (e.g., deadline homework /by 2024-03-15 2359)");
+        System.out.println("  event <description> /from yyyy-MM-dd HHmm /to yyyy-MM-dd HHmm");
+        System.out.println("    adds an event (e.g., event meeting /from 2024-03-15 1400 /to 2024-03-15 1600)");
+        System.out.println("  list");
+        System.out.println("    shows all tasks");
+        System.out.println("  find <keyword>");
+        System.out.println("    finds tasks containing the keyword");
+        System.out.println("  mark <task-number>");
+        System.out.println("    marks a task as done");
+        System.out.println("  unmark <task-number>");
+        System.out.println("    marks a task as not done");
+        System.out.println("  delete <task-number>");
+        System.out.println("    deletes a task");
+        System.out.println("  show date yyyy-MM-dd");
+        System.out.println("    shows tasks on a specific date");
+        System.out.println("  help");
+        System.out.println("    shows this help message");
+        System.out.println("  bye");
+        System.out.println("    exits the program");
+        System.out.println("____________________________________________________________");
+    }
+
     /**
      * Starts the chatbot and processes user commands until exit.
      * Supports commands for adding, listing, marking, and managing tasks.
      */
     public void run() {
         System.out.println("Hello I am Noga, what can I do for you?");
+        // System.out.println("Type 'help' to see what I can do!");
         Scanner scanner = new Scanner(System.in);
 
         while(true) {
             String userInput = scanner.nextLine().trim();
             if(userInput.equals("bye")){
                 break;
-            }       
+            }
+            if(userInput.equals("help")) {
+                showHelp();
+                continue;
+            }
             if(userInput.equals("list")){
                 System.out.println("____________________________________________________________");
                 System.out.println("Here are the tasks in your list:");
@@ -350,18 +388,8 @@ public class Noga {
                     continue;
                 }
             } else {
-                System.out.println("I'm not sure what you mean. Here are the commands I understand:");
-                System.out.println("  todo <description>");
-                System.out.println("  deadline <description> /by <deadline>");
-                System.out.println("  event <description> /from <start-time> /to <end-time>");
-                System.out.println("  list");
-                System.out.println("  find <keyword>");
-                System.out.println("  mark <task-number>");
-                System.out.println("  unmark <task-number>");
-                System.out.println("  delete <task-number>");
-                System.out.println("  show date <date>");
-                System.out.println("  bye");
-                System.out.println("____________________________________________________________");
+                System.out.println("I'm not sure what you mean.");
+                System.out.println("Type 'help' to see what I can do!");
                 continue;
             }
             
