@@ -125,11 +125,13 @@ public class Noga {
      * Shows all tasks scheduled for a specific date.
      *
      * @param dateStr the date to search for in format "yyyy-MM-dd"
+     * @return String containing the tasks found on the specified date
      */
-    private void showTasksOnDate(String dateStr) {
+    private String showTasksOnDate(String dateStr) {
         try {
             LocalDate date = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            System.out.println("Tasks on " + date.format(DateTimeFormatter.ofPattern("MMM d yyyy")) + ":");
+            StringBuilder response = new StringBuilder();
+            response.append("Tasks on ").append(date.format(DateTimeFormatter.ofPattern("MMM d yyyy"))).append(":\n");
             boolean found = false;
             
             for (int i = 1; i < cur_index; i++) {
@@ -143,63 +145,213 @@ public class Noga {
                 }
                 
                 if (taskDate != null && taskDate.toLocalDate().equals(date)) {
-                    System.out.println(i + "." + task);
+                    response.append(i).append(".").append(task).append("\n");
                     found = true;
                 }
             }
             
             if (!found) {
-                System.out.println("No tasks found on this date.");
+                response.append("No tasks found on this date.");
             }
+            return response.toString();
         } catch (DateTimeParseException e) {
-            System.out.println("Please use the format yyyy-MM-dd (e.g., 2024-03-15)");
+            return "Please use the format yyyy-MM-dd (e.g., 2024-03-15)";
         }
     }
 
-    private void findTasks(String keyword) {
-        System.out.println("____________________________________________________________");
-        System.out.println("Here are the matching tasks in your list:");
+    private String findTasks(String keyword) {
+        StringBuilder response = new StringBuilder();
+        response.append("Here are the matching tasks in your list:\n");
         boolean found = false;
         
         for (int i = 1; i < cur_index; i++) {
             if (tasks[i].getDescription().toLowerCase().contains(keyword.toLowerCase())) {
-                System.out.println(i + "." + tasks[i]);
+                response.append(i).append(".").append(tasks[i]).append("\n");
                 found = true;
             }
         }
         
         if (!found) {
-            System.out.println("No matching tasks found.");
+            response.append("No matching tasks found.");
         }
-        System.out.println("____________________________________________________________");
+        return response.toString();
     }
 
-    private void showHelp() {
-        System.out.println("____________________________________________________________");
-        System.out.println("Here are the commands I understand:");
-        System.out.println("  todo <description>");
-        System.out.println("    adds a todo task");
-        System.out.println("  deadline <description> /by yyyy-MM-dd HHmm");
-        System.out.println("    adds a deadline task (e.g., deadline homework /by 2024-03-15 2359)");
-        System.out.println("  event <description> /from yyyy-MM-dd HHmm /to yyyy-MM-dd HHmm");
-        System.out.println("    adds an event (e.g., event meeting /from 2024-03-15 1400 /to 2024-03-15 1600)");
-        System.out.println("  list");
-        System.out.println("    shows all tasks");
-        System.out.println("  find <keyword>");
-        System.out.println("    finds tasks containing the keyword");
-        System.out.println("  mark <task-number>");
-        System.out.println("    marks a task as done");
-        System.out.println("  unmark <task-number>");
-        System.out.println("    marks a task as not done");
-        System.out.println("  delete <task-number>");
-        System.out.println("    deletes a task");
-        System.out.println("  show date yyyy-MM-dd");
-        System.out.println("    shows tasks on a specific date");
-        System.out.println("  help");
-        System.out.println("    shows this help message");
-        System.out.println("  bye");
-        System.out.println("    exits the program");
-        System.out.println("____________________________________________________________");
+    /**
+     * Processes a single user input and returns the appropriate response
+     * @param userInput the input string from the user
+     * @return the response string to display
+     */
+    public String getResponse(String userInput) {
+        userInput = userInput.trim();
+        
+        if (userInput.equals("bye")) {
+            return "Bye. Hope to see you again soon!";
+        }
+        
+        if (userInput.equals("help")) {
+            StringBuilder response = new StringBuilder();
+            response.append("Here are the commands I understand:\n");
+            response.append("  todo <description>\n");
+            response.append("    adds a todo task\n");
+            response.append("  deadline <description> /by yyyy-MM-dd HHmm\n");
+            response.append("    adds a deadline task (e.g., deadline homework /by 2024-03-15 2359)\n");
+            response.append("  event <description> /from yyyy-MM-dd HHmm /to yyyy-MM-dd HHmm\n");
+            response.append("    adds an event (e.g., event meeting /from 2024-03-15 1400 /to 2024-03-15 1600)\n");
+            response.append("  list\n");
+            response.append("    shows all tasks\n");
+            response.append("  find <keyword>\n");
+            response.append("    finds tasks containing the keyword\n");
+            response.append("  mark <task-number>\n");
+            response.append("    marks a task as done\n");
+            response.append("  unmark <task-number>\n");
+            response.append("    marks a task as not done\n");
+            response.append("  delete <task-number>\n");
+            response.append("    deletes a task\n");
+            response.append("  show date yyyy-MM-dd\n");
+            response.append("    shows tasks on a specific date\n");
+            response.append("  help\n");
+            response.append("    shows this help message\n");
+            response.append("  bye\n");
+            response.append("    exits the program");
+            return response.toString();
+        }
+        
+        if (userInput.equals("list")) {
+            StringBuilder response = new StringBuilder("Here are the tasks in your list:\n");
+            for (int i = 1; i < cur_index; i++) {
+                response.append(i).append(".").append(tasks[i]).append("\n");
+            }
+            return response.toString();
+        }
+        
+        if (userInput.startsWith("mark")) {
+            try {
+                String[] parts = userInput.split(" ");
+                if (parts.length < 2) {
+                    return "Please specify which task to mark (e.g., mark 1)";
+                }
+                int index = Integer.parseInt(parts[1]);
+                if (index < 1 || index >= cur_index) {
+                    return "Task number " + index + " does not exist!";
+                }
+                tasks[index].mark();
+                saveTasks();
+                return "Nice! I've marked this task as done:\n" + tasks[index];
+            } catch (NumberFormatException e) {
+                return "Please provide a valid task number!";
+            }
+        }
+        
+        if (userInput.startsWith("unmark")) {
+            try {
+                String[] parts = userInput.split(" ");
+                if (parts.length < 2) {
+                    return "Please specify which task to unmark (e.g., unmark 1)";
+                }
+                int index = Integer.parseInt(parts[1]);
+                if (index < 1 || index >= cur_index) {
+                    return "Task number " + index + " does not exist!";
+                }
+                tasks[index].unmark();
+                saveTasks();
+                return "OK, I've marked this task as not done yet:\n" + tasks[index];
+            } catch (NumberFormatException e) {
+                return "Please provide a valid task number!";
+            }
+        }
+        
+        if (userInput.startsWith("delete")) {
+            try {
+                String[] parts = userInput.split(" ");
+                if (parts.length < 2) {
+                    return "Please specify which task to delete (e.g., delete 1)";
+                }
+                int index = Integer.parseInt(parts[1]);
+                if (index < 1 || index >= cur_index) {
+                    return "Task number " + index + " does not exist!";
+                }
+                String taskDescription = tasks[index].getDescription();
+                System.out.println("____________________________________________________________");
+                System.out.println("Noted. I've removed this task:");
+                System.out.println("  " + tasks[index]);
+                
+                // Shift remaining tasks to fill the gap
+                for (int i = index; i < cur_index - 1; i++) {
+                    tasks[i] = tasks[i + 1];
+                }
+                cur_index--;
+                
+                saveTasks();
+                return "Now you have " + (cur_index - 1) + " tasks in the list.";
+            } catch (NumberFormatException e) {
+                return "Please provide a valid task number!";
+            }
+        }
+        
+        if (userInput.startsWith("show date")) {
+            String dateStr = userInput.substring(9).trim();
+            if (dateStr.isEmpty()) {
+                return "Please specify a date (yyyy-MM-dd)";
+            }
+            return showTasksOnDate(dateStr);
+        }
+        
+        if (userInput.startsWith("find")) {
+            String keyword = userInput.substring(4).trim();
+            if (keyword.isEmpty()) {
+                return "Please provide a keyword to search for!";
+            }
+            return findTasks(keyword);
+        }
+        
+        if (userInput.startsWith("todo")) {
+            String description = userInput.substring(4).trim();
+            if (description.isEmpty()) {
+                return "Please provide a description for your todo!";
+            }
+            tasks[cur_index] = new Task(description);
+            cur_index++;
+            saveTasks();
+            return "Got it. I've added this task:\n  " + tasks[cur_index - 1] + 
+                   "\nNow you have " + (cur_index - 1) + " tasks in the list.";
+        }
+        
+        if (userInput.startsWith("deadline")) {
+            String[] parts = userInput.split(" /by ");
+            if (parts.length != 2 || parts[0].substring(8).trim().isEmpty()) {
+                return "Please use the format: deadline <description> /by yyyy-MM-dd HHmm";
+            }
+            String description = parts[0].substring(8).trim();
+            try {
+                tasks[cur_index] = new Deadline(description, parts[1].trim());
+            } catch (DateTimeParseException e) {
+                return "Please use the format yyyy-MM-dd HHmm for the deadline";
+            }
+            cur_index++;
+            saveTasks();
+            return "Got it. I've added this task:\n  " + tasks[cur_index - 1] + 
+                   "\nNow you have " + (cur_index - 1) + " tasks in the list.";
+        }
+        
+        if (userInput.startsWith("event")) {
+            String[] parts = userInput.split(" /from | /to ");
+            if (parts.length != 3 || parts[0].substring(5).trim().isEmpty()) {
+                return "Please use the format: event <description> /from yyyy-MM-dd HHmm /to yyyy-MM-dd HHmm";
+            }
+            String description = parts[0].substring(5).trim();
+            try {
+                tasks[cur_index] = new Event(description, parts[1].trim(), parts[2].trim());
+            } catch (DateTimeParseException e) {
+                return "Please use the format yyyy-MM-dd HHmm for the dates";
+            }
+            cur_index++;
+            saveTasks();
+            return "Got it. I've added this task:\n  " + tasks[cur_index - 1] + 
+                   "\nNow you have " + (cur_index - 1) + " tasks in the list.";
+        }
+        
+        return "I'm not sure what you mean.\nType 'help' to see what I can do!";
     }
 
     /**
@@ -208,199 +360,19 @@ public class Noga {
      */
     public void run() {
         System.out.println("Hello I am Noga, what can I do for you?");
-        // System.out.println("Type 'help' to see what I can do!");
         Scanner scanner = new Scanner(System.in);
-
-        while(true) {
-            String userInput = scanner.nextLine().trim();
-            if(userInput.equals("bye")){
+        
+        while (true) {
+            String userInput = scanner.nextLine();
+            String response = getResponse(userInput);
+            System.out.println("____________________________________________________________");
+            System.out.println(response);
+            System.out.println("____________________________________________________________");
+            
+            if (userInput.trim().equals("bye")) {
                 break;
             }
-            if(userInput.equals("help")) {
-                showHelp();
-                continue;
-            }
-            if(userInput.equals("list")){
-                System.out.println("____________________________________________________________");
-                System.out.println("Here are the tasks in your list:");
-                for(int i = 1; i < cur_index; i++){
-                    System.out.println(i + "." + tasks[i]);
-                }
-                System.out.println("____________________________________________________________");
-                continue;
-            }
-            if(userInput.startsWith("mark")){
-                try {
-                    String[] parts = userInput.split(" ");
-                    if (parts.length < 2) {
-                        System.out.println("____________________________________________________________");
-                        System.out.println("Please specify which task to mark (e.g., mark 1)");
-                        System.out.println("____________________________________________________________");
-                        continue;
-                    }
-                    int index = Integer.parseInt(parts[1]);
-                    if (index < 1 || index >= cur_index) {
-                        System.out.println("____________________________________________________________");
-                        System.out.println("Task number " + index + " does not exist!");
-                        System.out.println("____________________________________________________________");
-                        continue;
-                    }
-                    tasks[index].mark();
-                    System.out.println("Nice! I've marked this task as done:");
-                    System.out.println(tasks[index]);
-                    saveTasks();
-                } catch (NumberFormatException e) {
-                    System.out.println("____________________________________________________________");
-                    System.out.println("Please provide a valid task number!");
-                    System.out.println("____________________________________________________________");
-                }
-                continue;
-            }
-            if(userInput.startsWith("unmark")){
-                try {
-                    String[] parts = userInput.split(" ");
-                    if (parts.length < 2) {
-                        System.out.println("____________________________________________________________");
-                        System.out.println("Please specify which task to unmark (e.g., unmark 1)");
-                        System.out.println("____________________________________________________________");
-                        continue;
-                    }
-                    int index = Integer.parseInt(parts[1]);
-                    if (index < 1 || index >= cur_index) {
-                        System.out.println("____________________________________________________________");
-                        System.out.println("Task number " + index + " does not exist!");
-                        System.out.println("____________________________________________________________");
-                        continue;
-                    }
-                    tasks[index].unmark();
-                    System.out.println("OK, I've marked this task as not done yet:");
-                    System.out.println(tasks[index]);
-                    saveTasks();
-                } catch (NumberFormatException e) {
-                    System.out.println("____________________________________________________________");
-                    System.out.println("Please provide a valid task number!");
-                    System.out.println("____________________________________________________________");
-                }
-                continue;
-            }
-            if(userInput.startsWith("delete")){
-                try {
-                    String[] parts = userInput.split(" ");
-                    if (parts.length < 2) {
-                        System.out.println("____________________________________________________________");
-                        System.out.println("Please specify which task to delete (e.g., delete 1)");
-                        System.out.println("____________________________________________________________");
-                        continue;
-                    }
-                    int index = Integer.parseInt(parts[1]);
-                    if (index < 1 || index >= cur_index) {
-                        System.out.println("____________________________________________________________");
-                        System.out.println("Task number " + index + " does not exist!");
-                        System.out.println("____________________________________________________________");
-                        continue;
-                    }
-                    System.out.println("____________________________________________________________");
-                    System.out.println("Noted. I've removed this task:");
-                    System.out.println("  " + tasks[index]);
-                    
-                    // Shift remaining tasks to fill the gap
-                    for(int i = index; i < cur_index - 1; i++){
-                        tasks[i] = tasks[i + 1];
-                    }
-                    cur_index--;
-                    
-                    System.out.println("Now you have " + (cur_index-1) + " tasks in the list.");
-                    System.out.println("____________________________________________________________");
-                    saveTasks();
-                } catch (NumberFormatException e) {
-                    System.out.println("____________________________________________________________");
-                    System.out.println("Please provide a valid task number!");
-                    System.out.println("____________________________________________________________");
-                }
-                continue;
-            }
-            
-            // Add new command to show tasks on a specific date
-            if (userInput.startsWith("show date")) {
-                String dateStr = userInput.substring(9).trim();
-                if (dateStr.isEmpty()) {
-                    System.out.println("Please specify a date (yyyy-MM-dd)");
-                    continue;
-                }
-                showTasksOnDate(dateStr);
-                continue;
-            }
-            
-            // Add new command to find tasks
-            if (userInput.startsWith("find")) {
-                String keyword = userInput.substring(4).trim();
-                if (keyword.isEmpty()) {
-                    System.out.println("____________________________________________________________");
-                    System.out.println("Please provide a keyword to search for!");
-                    System.out.println("____________________________________________________________");
-                    continue;
-                }
-                findTasks(keyword);
-                continue;
-            }
-            
-            System.out.println("____________________________________________________________");
-            if(userInput.startsWith("todo")) {
-                String description = userInput.substring(4).trim();
-                if (description.isEmpty()) {
-                    System.out.println("Please provide a description for your todo!");
-                    System.out.println("____________________________________________________________");
-                    continue;
-                }
-                tasks[cur_index] = new Task(description);
-            } else if(userInput.startsWith("deadline")) {
-                String[] parts = userInput.split(" /by ");
-                if(parts.length != 2 || parts[0].substring(8).trim().isEmpty()) {
-                    System.out.println("Please use the format: deadline <description> /by yyyy-MM-dd HHmm");
-                    System.out.println("Example: deadline return book /by 2024-03-15 1800");
-                    System.out.println("____________________________________________________________");
-                    continue;
-                }
-                String description = parts[0].substring(8).trim();
-                try {
-                    tasks[cur_index] = new Deadline(description, parts[1].trim());
-                } catch (DateTimeParseException e) {
-                    System.out.println("Please use the format yyyy-MM-dd HHmm for the deadline");
-                    System.out.println("Example: 2024-03-15 1800 for March 15, 2024, 6:00 PM");
-                    System.out.println("____________________________________________________________");
-                    continue;
-                }
-            } else if(userInput.startsWith("event")) {
-                String[] parts = userInput.split(" /from | /to ");
-                if(parts.length != 3 || parts[0].substring(5).trim().isEmpty()) {
-                    System.out.println("Please use the format: event <description> /from yyyy-MM-dd HHmm /to yyyy-MM-dd HHmm");
-                    System.out.println("Example: event project meeting /from 2024-03-15 1400 /to 2024-03-15 1600");
-                    System.out.println("____________________________________________________________");
-                    continue;
-                }
-                String description = parts[0].substring(5).trim();
-                try {
-                    tasks[cur_index] = new Event(description, parts[1].trim(), parts[2].trim());
-                } catch (DateTimeParseException e) {
-                    System.out.println("Please use the format yyyy-MM-dd HHmm for the dates");
-                    System.out.println("Example: 2024-03-15 1400 for March 15, 2024, 2:00 PM");
-                    System.out.println("____________________________________________________________");
-                    continue;
-                }
-            } else {
-                System.out.println("I'm not sure what you mean.");
-                System.out.println("Type 'help' to see what I can do!");
-                continue;
-            }
-            
-            System.out.println("Got it. I've added this task:");
-            System.out.println("  " + tasks[cur_index]);
-            cur_index++;
-            System.out.println("Now you have " + (cur_index-1) + " tasks in the list.");
-            System.out.println("____________________________________________________________");
-            saveTasks();
         }
-        System.out.println("Bye. Hope to see you again soon!");
     }
 
     /**
