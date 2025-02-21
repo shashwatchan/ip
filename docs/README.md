@@ -1,30 +1,19 @@
-# Noga User Guide
+# Noga  
 
-// Update the title above to match the actual product name
+Noga is a streamlined, text-based task manager designed to help you stay organized effortlessly. It's:  
+- Text-based  
+- Simple to use  
+- ~~FAST~~ _SUPER_ FAST to navigate  
 
-// Product screenshot goes here
+## Features:  
+1. `list` – Shows all tasks.  
+2. `todo <description>` – Adds a new to-do task.  
+3. `deadline <description> /by <yyyy-MM-dd>` – Adds a task with a deadline.  
+4. `event <description> /from <yyyy-MM-dd> /to <yyyy-MM-dd>` – Adds an event.  
+5. `mark <task number>` – Marks a task as completed.  
+6. `unmark <task number>` – Marks a task as not done.  
+7. `delete <task number>` – Removes a task.  
+8. `help` – Displays the help message.  
+9. `find <keyword>` – Searches for tasks containing `<keyword>`.  
 
-// Product intro goes here
-
-## Adding deadlines
-
-// Describe the action and its outcome.
-
-// Give examples of usage
-
-Example: `keyword (optional arguments)`
-
-// A description of the expected outcome goes here
-
-```
-expected output
-```
-
-## Feature ABC
-
-// Feature details
-
-
-## Feature XYZ
-
-// Feature details
+Stay organized with Noga—the reliable way to manage your tasks!
