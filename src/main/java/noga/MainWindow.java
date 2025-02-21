@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
@@ -21,6 +22,9 @@ public class MainWindow extends AnchorPane {
     private Button sendButton;  // Button to send messages
 
     private Noga noga;  // The chatbot instance
+
+    private Image userImage = new Image(this.getClass().getResourceAsStream("/images/user.jpeg"));
+    private Image nogaImage = new Image(this.getClass().getResourceAsStream("/images/Noga.jpeg"));
 
     @FXML
     public void initialize() {
@@ -42,8 +46,8 @@ public class MainWindow extends AnchorPane {
         String input = userInput.getText();
         String response = noga.getResponse(input);
         dialogContainer.getChildren().addAll(
-                DialogBox.getUserDialog(input, null),
-                DialogBox.getNogaDialog(response, null)
+                DialogBox.getUserDialog(input, userImage),
+                DialogBox.getNogaDialog(response, nogaImage)
         );
         userInput.clear();
     }
