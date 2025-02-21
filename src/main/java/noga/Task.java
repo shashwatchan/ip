@@ -11,9 +11,10 @@ public class Task {
      * Creates a new Task with the given description.
      * The task is initially not done.
      *
-     * @param description the description of the task
+     * @param description the description of the task (must not be null)
      */
     public Task(String description) {
+        assert description != null : "Task description cannot be null";
         this.description = description;
         this.isDone = false;
     }

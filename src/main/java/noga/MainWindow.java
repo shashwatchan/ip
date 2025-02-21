@@ -18,12 +18,13 @@ public class MainWindow extends AnchorPane {
     @FXML
     private TextField userInput;
     @FXML
-    private Button sendButton;
+    private Button sendButton;  // Button to send messages
 
-    private Noga noga;
+    private Noga noga;  // The chatbot instance
 
     @FXML
     public void initialize() {
+        // Bind scroll pane to dialog container height for auto-scrolling
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
     }
 
