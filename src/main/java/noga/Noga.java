@@ -31,6 +31,7 @@ public class Noga {
         cur_index = 1;
         createDataDirectory();
         loadTasks();
+        assert cur_index >= 1 && cur_index <= 100 : "cur_index out of bounds: " + cur_index;
     }
 
     /**
@@ -98,9 +99,11 @@ public class Noga {
      * Each task is converted to its storage format before saving.
      */
     private void saveTasks() {
+        assert cur_index >= 1 && cur_index <= 100 : "cur_index out of bounds before saving: " + cur_index;
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(DATA_FILE));
             for (int i = 1; i < cur_index; i++) {
+                assert tasks[i] != null : "Null task found at index " + i;
                 Task task = tasks[i];
                 String line;
                 if (task instanceof Event) {
@@ -128,6 +131,7 @@ public class Noga {
      * @return String containing the tasks found on the specified date
      */
     private String showTasksOnDate(String dateStr) {
+        assert dateStr != null && !dateStr.trim().isEmpty() : "Date string cannot be null or empty";
         try {
             LocalDate date = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             StringBuilder response = new StringBuilder();
@@ -183,6 +187,7 @@ public class Noga {
      * @return the response string to display
      */
     public String getResponse(String userInput) {
+        assert userInput != null : "userInput cannot be null";
         userInput = userInput.trim();
         
         if (userInput.equals("bye")) {
@@ -232,9 +237,11 @@ public class Noga {
                     return "Please specify which task to mark (e.g., mark 1)";
                 }
                 int index = Integer.parseInt(parts[1]);
+                assert index >= 0 : "Task index cannot be negative: " + index;
                 if (index < 1 || index >= cur_index) {
                     return "Task number " + index + " does not exist!";
                 }
+                assert tasks[index] != null : "Task at index " + index + " is null";
                 tasks[index].mark();
                 saveTasks();
                 return "Nice! I've marked this task as done:\n" + tasks[index];
@@ -250,9 +257,11 @@ public class Noga {
                     return "Please specify which task to unmark (e.g., unmark 1)";
                 }
                 int index = Integer.parseInt(parts[1]);
+                assert index >= 0 : "Task index cannot be negative: " + index;
                 if (index < 1 || index >= cur_index) {
                     return "Task number " + index + " does not exist!";
                 }
+                assert tasks[index] != null : "Task at index " + index + " is null";
                 tasks[index].unmark();
                 saveTasks();
                 return "OK, I've marked this task as not done yet:\n" + tasks[index];
@@ -268,9 +277,11 @@ public class Noga {
                     return "Please specify which task to delete (e.g., delete 1)";
                 }
                 int index = Integer.parseInt(parts[1]);
+                assert index >= 0 : "Task index cannot be negative: " + index;
                 if (index < 1 || index >= cur_index) {
                     return "Task number " + index + " does not exist!";
                 }
+                assert tasks[index] != null : "Task at index " + index + " is null";
                 String taskDescription = tasks[index].getDescription();
                 System.out.println("____________________________________________________________");
                 System.out.println("Noted. I've removed this task:");
@@ -310,9 +321,11 @@ public class Noga {
             if (description.isEmpty()) {
                 return "Please provide a description for your todo!";
             }
+            assert cur_index < 100 : "Task list is full";
             tasks[cur_index] = new Task(description);
             cur_index++;
             saveTasks();
+            assert tasks[cur_index - 1] != null : "New task was not properly created";
             return "Got it. I've added this task:\n  " + tasks[cur_index - 1] + 
                    "\nNow you have " + (cur_index - 1) + " tasks in the list.";
         }
