@@ -19,9 +19,9 @@ import javafx.scene.layout.HBox;
  */
 public class DialogBox extends HBox {
     @FXML
-    private Label dialog;
+    private Label dialog;      // Label to display the message
     @FXML
-    private ImageView displayPicture;
+    private ImageView displayPicture;  // Image of the speaker
 
     private DialogBox(String text, Image img) {
         try {
